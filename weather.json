@@ -1,0 +1,301 @@
+{
+  "name": "weather",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fd344e49-e11a-4ef4-8f15-4f57308984b8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$json[\"city\"]}}"
+            },
+            {
+              "name": "appid",
+              "value": "f6e3fe3e0d5a0b8d04aeef55bbcb39f1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "fc6b84ed-960a-457d-9b92-ef802537e1e1",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "717c6a16-e3e5-4738-b463-3d2a72f1ee8a",
+              "name": "orders",
+              "value": "[   {     \"order_id\": \"1001\",     \"customer\": \"Alice Smith\",     \"city\": \"New York\",     \"status\": \"Pending\"   },   {     \"order_id\": \"1002\",     \"customer\": \"Bob Jones\",     \"city\": \"Mumbai\",     \"status\": \"Pending\"   },   {     \"order_id\": \"1003\",     \"customer\": \"Charlie Green\",     \"city\": \"London\",     \"status\": \"Pending\"   },   {     \"order_id\": \"1004\",     \"customer\": \"InvalidCity123\",     \"city\": \"InvalidCity123\",     \"status\": \"Pending\"   } ]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9b8a209a-63d0-4538-9ca5-a2ddd986f8d9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "orders",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "537a6e4d-5339-4665-871a-7ddf39fc1ffa",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c9276c0f-d362-4c31-b99a-08a5ed3f360f",
+              "leftValue": "={{$json[\"weather\"][0][\"main\"]}}",
+              "rightValue": "Clouds",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "819c5106-8da6-4a15-a734-4680e1460f0a",
+              "leftValue": "={{$json[\"weather\"][0][\"main\"]}}",
+              "rightValue": "Snow",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "f3f7e9c0-830b-4331-9db8-76278119b2e3",
+              "leftValue": "={{$json[\"weather\"][0][\"main\"]}}",
+              "rightValue": "Extreme",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "e1933f0e-d0eb-4b94-934b-b6d4d90110c2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ca8606f-8291-40fc-8755-95e5c4acdd02",
+              "name": "status",
+              "value": "Delayed",
+              "type": "string"
+            },
+            {
+              "id": "17e7563b-ce5e-4a0c-b2ef-cd48c82c7bb2",
+              "name": "message",
+              "value": "`Hi ${$json[\"customer\"]}, your order to ${$json[\"city\"]} is delayed due to ${$json[\"weather\"][0][\"main\"]}.`",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "ec3e0c07-ec6e-4ef3-a8e6-e0ee93522de0",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e7b39353-6798-4120-8809-a56fd525411f",
+              "name": "status",
+              "value": "On time",
+              "type": "string"
+            },
+            {
+              "id": "6246e692-5806-498f-a7ab-af59963c71e1",
+              "name": "message",
+              "value": "`Hi ${$json[\"customer\"]}, your order to ${$json[\"city\"]} is delayed due to ${$json[\"weather\"][0][\"main\"]}.`",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "60587af5-7397-418d-abd0-42f43792a3c5",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1296,
+        32
+      ],
+      "id": "aabd8ab3-b548-4c23-8a2e-02e8aaa5aa89",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "63bf213a-b117-4e26-a7b5-0b766b1ff715",
+  "meta": {
+    "instanceId": "b40e38151354082eb8dae7af58dc88da973f118c886bf4c613a31292ee0033f0"
+  },
+  "id": "c71StsYZJRjwXMUK",
+  "tags": []
+}
